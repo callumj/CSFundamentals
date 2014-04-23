@@ -26,6 +26,18 @@ public class Hashtable {
       this.table[bucketIndex] = new Item(key, value);
     else
       this.table[bucketIndex].setObject(key, value);
+
+    if (this.table[bucketIndex].obj == null && this.table[bucketIndex].next != null)
+      this.table[bucketIndex] = this.table[bucketIndex].next;
+  }
+
+  public int valueCount() {
+    int count = 0;
+    for(Item bucket : this.table) {
+      if (bucket != null)
+        count += bucket.objectCount;
+    }
+    return count;
   }
 
   public void printStats() {

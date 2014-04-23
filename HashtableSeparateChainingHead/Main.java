@@ -1,6 +1,7 @@
 import java.io.*;
 import java.util.regex.*;
 import java.util.HashMap;
+import java.util.ArrayList;
 
 public class Main {
 
@@ -17,6 +18,8 @@ public class Main {
     StringBuffer definition = null;
     String word = null;
     BufferedReader br = new BufferedReader(new FileReader("dictionary.txt"));
+
+    int words = 0;
     try {
       String line = br.readLine();
       while (line != null) {
@@ -28,6 +31,7 @@ public class Main {
               if (definitionPattern.matcher(line).matches()) {
                 if (definition != null) {
                   // commit
+                  words++;
                   String collapse = definition.toString();
                   h.set(word, collapse);
                   checker.put(word, collapse);
@@ -57,9 +61,25 @@ public class Main {
         br.close();
     }
 
+    if (h.valueCount() != checker.values().size())
+      System.out.println("Count incorrect.");
+
+    ArrayList<Double> hTimes = new ArrayList<Double>(h.valueCount());
+    ArrayList<Double> checkerTimes = new ArrayList<Double>(h.valueCount());
+
     for(String key : checker.keySet()) {
+      double checkerStart = System.nanoTime();
       String checkerResult = checker.get(key);
+      double checkerEnd = System.nanoTime() * 1.0;
+
+      double hStart = System.nanoTime();
       String other = (String)h.get(key);
+      double hEnd = System.nanoTime() * .10;
+
+      double hDiff = (hEnd - hStart) / 1000.0;
+      hTimes.add(hDiff);
+      double checkerDiff = (checkerEnd - checkerStart) / 1000.0;
+      checkerTimes.add(checkerDiff);
 
       if (checkerResult != other) {
         System.out.println("Failure at: " + key);
@@ -67,7 +87,24 @@ public class Main {
         System.out.println("-----");
         System.out.println("\t" + other);
       }
+      h.set(key, null);
     }
+
+
+    double hTotal = 0;
+    for(Double val : hTimes)
+      hTotal += val;
+
+    double checkerTotal = 0;
+    for(Double val : checkerTimes)
+      checkerTotal += val;
+
+    double hAvg = hTotal / Double.valueOf(hTimes.size());
+    double checkerAvg = checkerTotal / Double.valueOf(checkerTimes.size());
+
+    System.out.print("My avg time: " + hAvg);
+    System.out.println("Java time: " + checkerAvg);
+
   }
 
 }
