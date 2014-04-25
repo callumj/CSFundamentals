@@ -22,10 +22,10 @@ public class Main {
       System.out.println(h.get(str));
     }
 
-    //performDictionaryCheck(h);
+    performDictionaryCheck(h);
   }
 
-  private void performDictionaryCheck(Hashtable h) throws java.io.IOException {
+  private static void performDictionaryCheck(Hashtable h) throws java.io.IOException {
     HashMap<String, String> checker = new HashMap<String, String>();
 
     Pattern pattern = Pattern.compile("^\\*\\*\\*\\s+START\\s+OF\\s+THIS\\s+PROJECT.+");
