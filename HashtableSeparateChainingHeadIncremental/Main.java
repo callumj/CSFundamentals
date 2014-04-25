@@ -22,6 +22,8 @@ public class Main {
       System.out.println(h.get(str));
     }
 
+    h = new Hashtable();
+
     performDictionaryCheck(h);
   }
 
@@ -80,11 +82,11 @@ public class Main {
         br.close();
     }
 
-    if (h.valueCount() != checker.values().size())
+    if (h.numberValues() != checker.values().size())
       System.out.println("Count incorrect.");
 
-    ArrayList<Double> hTimes = new ArrayList<Double>(h.valueCount());
-    ArrayList<Double> checkerTimes = new ArrayList<Double>(h.valueCount());
+    ArrayList<Double> hTimes = new ArrayList<Double>(h.numberValues());
+    ArrayList<Double> checkerTimes = new ArrayList<Double>(h.numberValues());
 
     for(String key : checker.keySet()) {
       double checkerStart = System.nanoTime();
@@ -106,7 +108,6 @@ public class Main {
         System.out.println("-----");
         System.out.println("\t" + other);
       }
-      h.set(key, null);
     }
 
 

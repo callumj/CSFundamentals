@@ -14,15 +14,15 @@ public class Item {
       this.objectCount = 1;
   }
 
-  public void setObject(Object incomingKey, Object incomingObj) {
-    applyObject(incomingKey, incomingObj);
-    
-    // sync count
+  public void setObject(Object incomingKey, Object incomingObj, boolean noOverWrite) {
+    applyObject(incomingKey, incomingObj, noOverWrite);
+
+        // sync count
     if (this.obj == null)
       this.objectCount = 0;
     else
       this.objectCount = 1;
-    
+
     if (this.next != null)
       this.objectCount += this.next.objectCount;
   }
@@ -30,7 +30,7 @@ public class Item {
   public Object getObject(Object lookingKey) {
     int incomingHashCode = lookingKey.hashCode();
     if (this.hashCode == incomingHashCode && (lookingKey == this.key || this.key.equals(lookingKey)))
-    {      
+    {
       return obj;
     }
     else if (this.next != null)
@@ -42,12 +42,19 @@ public class Item {
   public Item[] removeObjects(int count) {
     Item[] alloc = new Item[count];
     int index = 0;
+    while (index < count && this.next != null) {
+      alloc[index] = this.next;
+      this.next = this.next.next;
+      index++;
+    }
     return alloc;
   }
-  
-  private void applyObject(Object incomingKey, Object incomingObj) {
+
+  private void applyObject(Object incomingKey, Object incomingObj, boolean noOverWrite) {
     int incomingHashCode = incomingKey.hashCode();
     if (this.hashCode == incomingHashCode && (incomingKey == this.key || this.key.equals(incomingKey))) {
+      if (noOverWrite)
+        return;
       this.obj = incomingObj;
     } else {
       if (this.hashCode < incomingHashCode) {
@@ -62,7 +69,7 @@ public class Item {
           if (this.next == null) {
             this.next = new Item(movingKey, movingObject);
           } else {
-            this.next.setObject(movingKey, movingObject);
+            this.next.setObject(movingKey, movingObject, noOverWrite);
           }
         }
 
@@ -83,7 +90,7 @@ public class Item {
               return;
             }
           } else {
-            this.next.setObject(incomingKey, incomingObj);
+            this.next.setObject(incomingKey, incomingObj, noOverWrite);
           }
         }
       }

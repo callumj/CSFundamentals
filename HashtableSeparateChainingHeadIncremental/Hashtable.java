@@ -34,15 +34,15 @@ public class Hashtable {
   }
 
   public void set(Object key, Object value) {
-    this.set(key, value, false);
+    this.set(key, value, false, false);
   }
 
-  private void set(Object key, Object value, boolean doNotResize) {
+  private void set(Object key, Object value, boolean doNotResize, boolean noOverWrite) {
     int bucketIndex = computeHash(key, isTwoTableSetup());
     if (this.settingTable[bucketIndex] == null)
       this.settingTable[bucketIndex] = new Item(key, value);
     else
-      this.settingTable[bucketIndex].setObject(key, value);
+      this.settingTable[bucketIndex].setObject(key, value, noOverWrite);
 
     if (this.settingTable[bucketIndex].obj == null && this.settingTable[bucketIndex].next != null)
       this.settingTable[bucketIndex] = this.settingTable[bucketIndex].next;
@@ -51,13 +51,21 @@ public class Hashtable {
       this.resizeIfNeeded();
   }
 
-  public int valueCount() {
+  public int numberValues() {
+    int base = this.valueCount(false);
+    if (this.futureTable != null)
+      base += this.valueCount(true);
+
+    return base;
+  }
+
+  private int valueCount() {
     return this.valueCount(false);
   }
 
   private int valueCount(boolean useFuture) {
     int count = 0;
-    for(Item bucket : (useFuture ? this.futureTable : this.table)) {
+    for (Item bucket : (useFuture ? this.futureTable : this.table)) {
       if (bucket != null)
         count += bucket.objectCount;
     }
@@ -66,7 +74,7 @@ public class Hashtable {
 
   public void printStats() {
     int index = 0;
-    for(Item bucket : this.table) {
+    for (Item bucket : this.table) {
       System.out.println(index + ": " + (bucket == null ? "empty" : bucket.objectCount));
 
       index++;
@@ -86,13 +94,12 @@ public class Hashtable {
 
     if (((curCount * 1.0) / (this.settingTable.length * 1.0)) >= 0.75) {
           // resize!
-
       if (this.settingTable == this.table) {
-        System.out.println("Resizing");
         this.futureTable = new Item[this.table.length * 2];
         this.settingTable = this.futureTable;
       } else {
-              // our future table has already outgrown, take evasive action
+        System.out.println("\tNeed another resizing");
+        // our future table has already outgrown, take evasive action
       }
     }
 
@@ -100,16 +107,20 @@ public class Hashtable {
   }
 
   private void incrementallyCopy(int currentAmount) {
+    if (this.futureTable == null)
+      return;
+
     if (currentAmount == -1)
       currentAmount = this.valueCount(false);
 
     if (currentAmount == 0)
       return;
 
-    int amountToCopy = (int) Math.round(currentAmount * 0.25);
+    int amountToCopy = ((int) Math.round(currentAmount * 0.5)) + 1;
 
-    if (amountToCopy == 0)
+    if (amountToCopy == 0) {
       return;
+    }
 
     int index = 0;
     Item target = this.table[index];
@@ -122,17 +133,19 @@ public class Hashtable {
       } else {
         Item[] received = target.removeObjects(amountToCopy);
 
-        for(Item item : received) {
+        for (Item item : received) {
           if (item == null || item.obj == null)
             continue;
 
-          this.set(item.key, item.obj, true);
+          this.set(item.key, item.obj, true, true);
           amountToCopy--;
         }
 
         this.table[index] = target.next;
-        this.set(target.key, target.obj, true);
+        this.set(target.key, target.obj, true, true);
         amountToCopy--;
+
+        target = this.table[index];
       }
     }
   }
