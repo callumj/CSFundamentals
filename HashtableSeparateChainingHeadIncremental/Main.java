@@ -10,14 +10,14 @@ public class Main {
 
     h.set("Hello", "Joe");
 
-    for(int i = 0; i < 300; i++) {
+    for(int i = 0; i < 1000; i++) {
       String str = Integer.toString(i);
       h.set(str, str);
     }
 
     System.out.println(h.get("Hello"));
 
-    for(int i = 0; i < 300; i++) {
+    for(int i = 0; i < 1000; i++) {
       String str = Integer.toString(i);
       System.out.println(h.get(str));
     }

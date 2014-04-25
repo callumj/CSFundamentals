@@ -23,7 +23,7 @@ public class Hashtable {
     if (this.settingTable[bucketIndex] != null)
       result = this.settingTable[bucketIndex].getObject(key);
 
-    // fallback
+      // fallback
     if (result == null && isTwoTableSetup()) {
       bucketIndex = computeHash(key, false);
       if (this.table[bucketIndex] != null)
@@ -74,7 +74,7 @@ public class Hashtable {
   }
 
   private void resizeIfNeeded() {
-    int curCount = this.valueCount(this.isTwoTableSetup());
+    int curCount = this.valueCount(false);
     if (curCount == 0 && this.futureTable != null && this.futureTable != this.table) {
       this.table = this.futureTable;
       this.settingTable = this.table;
@@ -85,14 +85,14 @@ public class Hashtable {
     }
 
     if (((curCount * 1.0) / (this.settingTable.length * 1.0)) >= 0.75) {
-      // resize!
+          // resize!
 
       if (this.settingTable == this.table) {
         System.out.println("Resizing");
         this.futureTable = new Item[this.table.length * 2];
         this.settingTable = this.futureTable;
       } else {
-        // our future table has already outgrown, take evasise action
+              // our future table has already outgrown, take evasive action
       }
     }
 
@@ -106,7 +106,7 @@ public class Hashtable {
     if (currentAmount == 0)
       return;
 
-    int amountToCopy = (int) Math.round(currentAmount * 0.1);
+    int amountToCopy = (int) Math.round(currentAmount * 0.25);
 
     if (amountToCopy == 0)
       return;
@@ -121,7 +121,7 @@ public class Hashtable {
         target = this.table[index];
       } else {
         Item[] received = target.removeObjects(amountToCopy);
-        
+
         for(Item item : received) {
           if (item == null || item.obj == null)
             continue;
