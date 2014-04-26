@@ -10,3 +10,9 @@ This is an open repository for me to relearn and educate myself in key Computer 
 * It gives me pointers but doesn't let me shoot myself
 * Java is a pretty good **root* language.
 * It's tested in coding interviews
+
+## Data structures
+
+* [HashtableSeparateChainingHead](HashtableSeparateChainingHead) - Hashtable implementation using linked lists with no resizing capabilities
+* [HashtableSeparateChainingHeadIncremental](HashtableSeparateChainingHeadIncremental) - Hashtable implementation using linked lists with increasing size capabilities
+* [ArrayList](ArrayList) - ArrayList (dynamic array) implementation with up/down sizing (linear copy)
