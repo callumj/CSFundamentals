@@ -2,8 +2,6 @@ public class Hashtable {
 
   private int DEFAULT_SIZE = 97;
 
-  public int usedBuckets;
-  public int activeObjects;
   public Item[] table;
   public Item[] futureTable; // indicates a table being moved to
 
@@ -12,8 +10,6 @@ public class Hashtable {
   public Hashtable() {
     this.table = new Item[DEFAULT_SIZE];
     this.settingTable = this.table;
-    this.usedBuckets = 0;
-    this.activeObjects = 0;
   }
 
   public Object get(Object key) {

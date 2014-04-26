@@ -82,7 +82,7 @@ public class Item {
             return;
           this.next = new Item(incomingKey, incomingObj);
         } else {
-          if (incomingObj == null && incomingHashCode == this.next.hashCode) {
+          if (incomingObj == null && (incomingHashCode == this.next.hashCode && (incomingKey == this.next.key || this.next.key.equals(incomingKey)))) {
             if (this.next.next == null) {
               this.next = null;
             } else {
