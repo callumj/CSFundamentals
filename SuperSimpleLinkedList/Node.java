@@ -1,4 +1,28 @@
 public class Node {
+
+
+  public class Enumerator implements java.util.Enumeration<Node> {
+
+    private Node head;
+    private Node current;
+
+    public Enumerator(Node start) {
+      this.head = start;
+      this.current = this.head;
+    }
+
+    public boolean hasMoreElements() {
+      return this.current != null;
+    }
+
+    public Node nextElement() {
+      Node ret = this.current;
+      this.current = this.current.next;
+      return ret;
+    }
+
+  }
+
   public Object obj;
   public Node next;
 
@@ -67,5 +91,9 @@ public class Node {
       target.next = target.next.next;
       return this;
     }
+  }
+
+  public Enumerator enumerator() {
+    return new Enumerator(this);
   }
 }

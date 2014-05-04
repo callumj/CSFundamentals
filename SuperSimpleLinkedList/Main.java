@@ -49,10 +49,8 @@ public class Main {
 
   public static void printTraverse(Node head) {
     System.out.println("-----");
-    while(head != null) {
-      System.out.println(head.obj);
-      head = head.next;
-    }
+    for (Node.Enumerator e = head.enumerator(); e.hasMoreElements();)
+      System.out.println(e.nextElement().obj);
     System.out.println("-----");
   }
 }
