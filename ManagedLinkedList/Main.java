@@ -7,10 +7,16 @@ public class Main {
     Node three = head.insertAfter(two, "3");
     Node five = head.insertAfter(three, "5");
     Node four = head.insertAfter(three, "4");
+    Node four2 = head.insertAfter(three, "4");
+    Node three2 = head.insertAfter(four2, "3");
 
     printTraverse(head);
 
-    head.removeAfter(three);
+    deDupe(head);
+
+    printTraverse(head);
+
+    /*head.removeAfter(three);
 
     printTraverse(head);
 
@@ -33,6 +39,8 @@ public class Main {
     head = head.remove(head);
 
     printTraverse(head);
+
+    deDupe(head);*/
   }
 
   public static void printTraverse(Node head) {
@@ -42,5 +50,23 @@ public class Main {
       System.out.println(obj);
     System.out.printf("Objects: %d\r\n", head.nodeCount);
     System.out.println("-----");
+  }
+
+  public static void deDupe(Node head) {
+    Node target = head;
+
+    while (target != null) {
+      Node child = target.next;
+      Node pntr = target;
+
+      while (child != null) {
+        if (child.obj != target.obj) {
+          pntr.next = child;
+          pntr = pntr.next;
+        }
+        child = child.next;
+      }
+      target = target.next;
+    }
   }
 }
