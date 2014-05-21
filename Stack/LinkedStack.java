@@ -39,4 +39,28 @@ public class LinkedStack extends StackCore {
   public int count() {
     return this.objectCount;
   }
+
+  public boolean isEmpty() {
+    return count() == 0;
+  }
+
+  public static void reorder(LinkedStack current) {
+    LinkedStack copy = new LinkedStack();
+
+    while(!current.isEmpty())
+      copy.push(current.pop());
+
+    while(!copy.isEmpty()) {
+      if (current.isEmpty() || ((Integer)current.peek()) > ((Integer)copy.peek()))
+        current.push(copy.pop());
+      else {
+        LinkedStack temp = new LinkedStack();
+        while(!current.isEmpty() && ((Integer)current.peek()) < ((Integer)copy.peek()))
+          temp.push(current.pop());
+        current.push(copy.pop());
+        while(!temp.isEmpty())
+          current.push(temp.pop());
+      }
+    }
+  }
 }

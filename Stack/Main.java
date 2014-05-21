@@ -23,6 +23,31 @@ public class Main {
       error = true;
     }
     assert error == true;
+
+    LinkedStack stk3 = new LinkedStack();
+    stk3.push(1);
+    stk3.push(2);
+    stk3.push(3);
+
+    LinkedStack.reorder(stk3);
+
+    assert stk3.pop() == (Integer)1;
+    assert stk3.pop() == (Integer)2;
+    assert stk3.pop() == (Integer)3;
+
+    stk3.push(4);
+    stk3.push(1);
+    stk3.push(5);
+    stk3.push(2);
+    stk3.push(3);
+
+    LinkedStack.reorder(stk3);
+
+    assert stk3.pop() == (Integer)1;
+    assert stk3.pop() == (Integer)2;
+    assert stk3.pop() == (Integer)3;
+    assert stk3.pop() == (Integer)4;
+    assert stk3.pop() == (Integer)5;
   }
 
   public static void doStackyThings(Stack stk) {
