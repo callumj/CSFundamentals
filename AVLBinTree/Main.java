@@ -5,21 +5,13 @@ public class Main {
   public static void main(String[] args) {
     BinaryTree t = new BinaryTree(20, null, null);
 
-    t.Add(10);
-    t.Add(19);
-    t.Add(25);
-    t.Add(21);
-    t.Add(29);
-    t.Add(24);
-    t.Add(28);
-    t.Add(48);
+    for (int i = 1; i < 1000000; i++)
+      t.Add(i);
 
-    //printTree(t);
-    //t.Find(28);
+    System.out.println(t.value);
+    t.Find(1);
 
-    t.Remove(20);
-    t.Find(24);
-    printTree(t);
+    t.Add(2000001);
   }
 
   public static void printTree(BinaryTree tree) {
