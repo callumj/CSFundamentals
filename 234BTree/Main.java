@@ -1,11 +1,14 @@
 public class Main {
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
     TTFTree<Integer> inst = new TTFTree<Integer>();
-    inst.Insert(8);
+    inst.Insert(60);
+    inst.Insert(20);
     inst.Insert(10);
-    inst.Insert(9);
-    inst.Insert(-1);
+    inst.Insert(30);
+    inst.Insert(25);
+    /*inst.Insert(50);
+    inst.Insert(80);*/
 
     inst.Print();
   }
