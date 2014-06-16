@@ -43,7 +43,7 @@ public class TTFTree<E extends java.lang.Comparable<E>> {
     return this.LessFirst == null && this.GreaterFirst == null && this.GreaterSecond == null && this.GreaterThird == null;
   }
 
-  public void Insert(E object) {
+  public void Insert(E object) throws Exception {
     reShuffleRootIfNeeded();
 
     if (isLeaf()) {
@@ -59,6 +59,11 @@ public class TTFTree<E extends java.lang.Comparable<E>> {
     } else {
       int compareFirst = object.compareTo(this.First);
       if (compareFirst == -1) {
+        boolean restart = stealMiddleFromChild(this.LessFirst);
+        if (restart) {
+          this.Insert(object);
+          return;
+        }
         AddToLessThanFirst(object);
       } else if (compareFirst == 0) {
         this.First = object;
@@ -68,6 +73,11 @@ public class TTFTree<E extends java.lang.Comparable<E>> {
         } else {
           int compareSecond = this.Second == null ? -1 : object.compareTo(this.Second);
           if (compareSecond == -1) {
+            boolean restart = stealMiddleFromChild(this.GreaterFirst);
+            if (restart) {
+              this.Insert(object);
+              return;
+            }
             AddToGreaterThanFirst(object);
           } else if (compareSecond == 0) {
             this.Second = object;
@@ -77,10 +87,20 @@ public class TTFTree<E extends java.lang.Comparable<E>> {
             } else {
               int compareThird = this.Third == null ? -1 : object.compareTo(this.Third);
               if (compareThird == -1) {
+                boolean restart = stealMiddleFromChild(this.GreaterSecond);
+                if (restart) {
+                  this.Insert(object);
+                  return;
+                }
                 AddToGreaterThanSecond(object);
               } else if (compareThird == 0) {
                 this.Third = object;
               } else {
+                boolean restart = stealMiddleFromChild(this.GreaterThird);
+                if (restart) {
+                  this.Insert(object);
+                  return;
+                }
                 AddToGreaterThanThird(object);
               }
             }
@@ -136,28 +156,28 @@ public class TTFTree<E extends java.lang.Comparable<E>> {
     }
   }
 
-  private void AddToLessThanFirst(E object) {
+  private void AddToLessThanFirst(E object) throws Exception {
     if (this.LessFirst == null)
       this.LessFirst = new TTFTree<E>(false);
 
     this.LessFirst.Insert(object);
   }
 
-  private void AddToGreaterThanFirst(E object) {
+  private void AddToGreaterThanFirst(E object) throws Exception {
     if (this.GreaterFirst == null)
       this.GreaterFirst = new TTFTree<E>(false);
 
     this.GreaterFirst.Insert(object);
   }
 
-  private void AddToGreaterThanSecond(E object) {
+  private void AddToGreaterThanSecond(E object) throws Exception {
     if (this.GreaterSecond == null)
       this.GreaterSecond = new TTFTree<E>(false);
 
     this.GreaterSecond.Insert(object);
   }
 
-  private void AddToGreaterThanThird(E object) {
+  private void AddToGreaterThanThird(E object) throws Exception {
     if (this.GreaterThird == null)
       this.GreaterThird = new TTFTree<E>(false);
 
@@ -183,15 +203,56 @@ public class TTFTree<E extends java.lang.Comparable<E>> {
     }
   }
 
-  private void stealMiddleFromChild() {
+  private boolean stealMiddleFromChild(TTFTree<E> target) throws Exception {
+    if (target == null)
+      return false;
 
+    if (target.nodesOnThisLevel() == 3) {
+      E middleValue = target.Second;
+      TTFTree<E> splitLeft = new TTFTree<E>(false);
+      splitLeft.First = target.First;
+
+      TTFTree<E> splitRight = new TTFTree<E>(false);
+      splitRight.First = target.Third;
+
+      System.out.println("Starting steal!");
+
+      if (target == this.GreaterThird) {
+        throw new Exception("I should not be a internal node with 3 nodes!");
+      } else if (target == this.GreaterSecond) {
+        // middle becomes third
+        this.Third = middleValue;
+        this.GreaterThird = splitRight;
+        this.GreaterSecond = splitLeft;
+        return true;
+      } else if (target == this.GreaterFirst) {
+        // middle becomes second
+        this.Third = this.Second;
+        this.GreaterThird = this.GreaterSecond;
+        this.Second = middleValue;
+        this.GreaterFirst = splitLeft;
+        this.GreaterSecond = splitRight;
+        return true;
+      } else {
+        // middle becomes first
+        this.Third = this.Second;
+        this.GreaterThird = this.GreaterSecond;
+        this.Second = this.First;
+        this.GreaterSecond = this.GreaterFirst;
+
+        this.First = middleValue;
+        this.LessFirst = splitLeft;
+        this.GreaterFirst = splitRight;
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private void reShuffleRootIfNeeded() {
     if (isRoot && nodesOnThisLevel() == 3) {
       E middle = this.Second;
-
-      System.out.println(middle);
 
       TTFTree<E> left = new TTFTree<E>(false);
       TTFTree<E> right = new TTFTree<E>(false);

@@ -7,8 +7,11 @@ public class Main {
     inst.Insert(10);
     inst.Insert(30);
     inst.Insert(25);
-    /*inst.Insert(50);
-    inst.Insert(80);*/
+    inst.Insert(50);
+    inst.Insert(80);
+    inst.Insert(55);
+    inst.Insert(58);
+    inst.Insert(57);
 
     inst.Print();
   }
