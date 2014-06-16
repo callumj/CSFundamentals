@@ -13,12 +13,31 @@ public class Main {
     inst.Insert(58);
     inst.Insert(57);
 
-    //inst.Print();
+    /*inst.Print();
 
     inst.Remove(80);
     inst.Remove(60);
-    //inst.Remove(25);*/
+    inst.Remove(25);
 
-    inst.Print();
+    inst.Print();*/
+
+    TTFTree<Integer> inst2 = new TTFTree<Integer>(false);
+    inst2.First = 20;
+    inst2.Second = 40;
+
+    inst2.LessFirst = new TTFTree<Integer>(false);
+    inst2.LessFirst.First = 10;
+
+    inst2.GreaterFirst = new TTFTree<Integer>(false);
+    inst2.GreaterFirst.First = 30;
+    inst2.GreaterFirst.LessFirst = new TTFTree<Integer>(false);
+    inst2.GreaterFirst.LessFirst.First = 25;
+
+    /*inst2.GreaterSecond = new TTFTree<Integer>(false);
+    inst2.GreaterSecond.First = 50;*/
+
+    inst2.Remove(25);
+
+    inst2.Print();
   }
 }

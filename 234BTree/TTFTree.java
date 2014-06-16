@@ -377,11 +377,12 @@ public class TTFTree<E extends java.lang.Comparable<E>> {
           handleRuleOne(child, target);
         } else if (this.Second == null && target.nodesOnThisLevel() == 1 && isRoot) {
           handleRuleTwo(child, target);
-        } else if (this.Second != null && target.nodesOnThisLevel() > 1 && !isRoot) {
+        } else if (this.Second != null && target.nodesOnThisLevel() == 1 && !isRoot) {
           handleRuleThree(child, target);
         }
       } else {
         // we need to work backwards
+        System.out.println(" Working backwards");
         if (child == this.GreaterFirst) {
           target = this.LessFirst;
         } else if (child == this.GreaterSecond) {
@@ -395,7 +396,7 @@ public class TTFTree<E extends java.lang.Comparable<E>> {
             handleRuleOne(target, child);
           } else if (this.Second == null && target.nodesOnThisLevel() == 1 && isRoot) {
             handleRuleTwo(target, child);
-          } else if (this.Second != null && target.nodesOnThisLevel() > 1 && !isRoot) {
+          } else if (this.Second != null && target.nodesOnThisLevel() == 1 && !isRoot) {
             handleRuleThree(target, child);
           }
         }
@@ -404,7 +405,7 @@ public class TTFTree<E extends java.lang.Comparable<E>> {
   }
 
   private void handleRuleOne(TTFTree<E> child, TTFTree<E> target) {
-    // swap out our relative object
+    // swap out our relative parent object
     E previousParent = null;
     TTFTree leftTree;
     if (child == this.LessFirst) {
@@ -443,7 +444,40 @@ public class TTFTree<E extends java.lang.Comparable<E>> {
   }
 
   private void handleRuleThree(TTFTree<E> child, TTFTree<E> target) {
-    
+
+    // modify our parent
+    E previousParent = null;
+    TTFTree<E> newTree = new TTFTree<E>(false);
+    if (child == this.LessFirst) {
+      previousParent = this.First;
+      this.First = this.Second;
+      this.Second = this.Third;
+      this.Third = null;
+      this.GreaterFirst = this.GreaterSecond;
+      this.GreaterSecond = this.GreaterThird;
+      this.GreaterThird = null;
+      this.LessFirst = newTree;
+    } else if (child == this.GreaterFirst) {
+      previousParent = this.Second;
+      this.Second = this.Third;
+      this.Third = null;
+      this.GreaterSecond = this.GreaterThird;
+      this.GreaterFirst = newTree;
+    } else if (child == this.GreaterSecond) {
+      previousParent = this.Third;
+      this.Third = null;
+      this.GreaterSecond = newTree;
+    } else {
+      return;
+    }
+
+    newTree.First = child.First;
+    newTree.Second = previousParent;
+    newTree.Third = target.First;
+    newTree.LessFirst = child.LessFirst;
+    newTree.GreaterFirst = child.GreaterFirst;
+    newTree.GreaterSecond = target.LessFirst;
+    target.GreaterThird = target.GreaterSecond;
   }
 
   public void Print() {
