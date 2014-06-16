@@ -1,0 +1,1 @@
+javac **.java && java -Xss16m -Xmx1024m -ea Main
