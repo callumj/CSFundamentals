@@ -25,6 +25,10 @@ public class TTFTree<E extends java.lang.Comparable<E>> {
     this(true);
   }
 
+  public String toString() {
+    return String.format("%s %s %s", this.First, this.Second, this.Third);
+  }
+
   public int nodesOnThisLevel() {
     int count = 0;
     if (this.First != null)
@@ -108,52 +112,102 @@ public class TTFTree<E extends java.lang.Comparable<E>> {
         }
       }
     }
+
+    bumpDownIfNeeded();
   }
 
-  public void Print() {
-    Print(0);
+  public void Remove(E object) {
+    System.out.format("I am %s %s %s\r\n", this.First, this.Second, this.Third);
+    if (this.First == null) {
+      return;
+    }
+
+    int compareFirst = object.compareTo(this.First);
+    if (compareFirst == -1) {
+      if (this.LessFirst != null) {
+        this.LessFirst.Remove(object);
+        checkForRuleViolations(this.LessFirst);
+      }
+    } else if (compareFirst == 0) {
+      this.First = null;
+      if (!isLeaf()) {
+        if (this.GreaterFirst != null) {
+          E extracted = this.GreaterFirst.FetchLeft();
+          if (extracted != null) {
+            this.GreaterFirst.Remove(extracted);
+            this.First = extracted;
+          }
+        }
+      } else {
+        this.First = this.Second;
+        this.Second = this.Third;
+        this.Third = null;
+      }
+    } else if (this.Second != null) {
+      int compareSecond = object.compareTo(this.Second);
+      if (compareSecond == -1) {
+        if (this.GreaterFirst != null) {
+          this.GreaterFirst.Remove(object);
+          checkForRuleViolations(this.GreaterFirst);
+        }
+      } else if (compareSecond == 0) {
+        this.Second = null;
+        if (!isLeaf()) {
+          if (this.GreaterSecond != null) {
+            E extracted = this.GreaterSecond.FetchLeft();
+            if (extracted != null) {
+              this.GreaterSecond.Remove(extracted);
+              this.Second = extracted;
+            }
+          }
+        } else {
+          this.Second = this.Third;
+          this.Third = null;
+        }
+      } else if (this.Third != null) {
+        int compareThird = object.compareTo(this.Third);
+        if (compareThird == -1) {
+          if (this.GreaterSecond != null) {
+            System.out.format("Sending to Right of %s\r\n", this.Second);
+            this.GreaterSecond.Remove(object);
+            checkForRuleViolations(this.GreaterSecond);
+          }
+        } else if (compareThird == 0) {
+          this.Third = null;
+          if (!isLeaf()) {
+            if (this.GreaterThird != null) {
+              E extracted = this.GreaterThird.FetchLeft();
+              if (extracted != null) {
+                this.GreaterThird.Remove(extracted);
+                this.Third = extracted;
+              }
+            }
+          }
+        } else if (this.GreaterThird != null) {
+          this.GreaterThird.Remove(object);
+          checkForRuleViolations(this.GreaterThird);
+        }
+      } else if (this.GreaterSecond != null) {
+        this.GreaterSecond.Remove(object);
+        checkForRuleViolations(this.GreaterSecond);
+      }
+    } else if (this.GreaterFirst != null) {
+      this.GreaterFirst.Remove(object);
+      checkForRuleViolations(this.GreaterFirst);
+    }
+
+    pruneChildren();
   }
 
-  public void Print(int padding) {
-    String paddingString = "";
-    for (int i = 0; i < padding; i++)
-      paddingString += " ";
-
-    String describeMe = isRoot ? "Root" : "Self";
-    System.out.format("%s%s:\r\n", paddingString, describeMe);
-    System.out.format("%s First: %s\r\n", paddingString, this.First == null ? "(null)" : this.First.toString());
-    System.out.format("%s Second: %s\r\n", paddingString, this.Second == null ? "(null)" : this.Second.toString());
-    System.out.format("%s Third: %s\r\n", paddingString, this.Third == null ? "(null)" : this.Third.toString());
-
-    System.out.println();
-    System.out.format("%sChildren:\r\n", paddingString);
-    System.out.format("%s Left First:\r\n", paddingString);
-    if (this.LessFirst != null) {
-      this.LessFirst.Print(padding + 3);
+  public E FetchLeft() {
+    if (this.isLeaf()) {
+      return this.First;
     } else {
-      System.out.format("%s  (null)\r\n", paddingString);
+      if (this.LessFirst != null)
+        return this.LessFirst.FetchLeft();
     }
 
-    System.out.format("%s Left Second:\r\n", paddingString);
-    if (this.GreaterFirst != null) {
-      this.GreaterFirst.Print(padding + 3);
-    } else {
-      System.out.format("%s  (null)\r\n", paddingString);
-    }
-
-    System.out.format("%s Left Third:\r\n", paddingString);
-    if (this.GreaterSecond != null) {
-      this.GreaterSecond.Print(padding + 3);
-    } else {
-      System.out.format("%s  (null)\r\n", paddingString);
-    }
-
-    System.out.format("%s Right Third:\r\n", paddingString);
-    if (this.GreaterThird != null) {
-      this.GreaterThird.Print(padding + 3);
-    } else {
-      System.out.format("%s  (null)\r\n", paddingString);
-    }
+    return null;
   }
 
   private void AddToLessThanFirst(E object) throws Exception {
@@ -203,6 +257,21 @@ public class TTFTree<E extends java.lang.Comparable<E>> {
     }
   }
 
+  private void bumpDownIfNeeded() {
+    if (!isLeaf())
+      return;
+
+    if (this.Second == null) {
+      this.Second = this.Third;
+      this.Third = null;
+    }
+
+    if (this.First == null) {
+      this.First = this.Second;
+      this.Second = null;
+    }
+  }
+
   private boolean stealMiddleFromChild(TTFTree<E> target) throws Exception {
     if (target == null)
       return false;
@@ -214,8 +283,6 @@ public class TTFTree<E extends java.lang.Comparable<E>> {
 
       TTFTree<E> splitRight = new TTFTree<E>(false);
       splitRight.First = target.Third;
-
-      System.out.println("Starting steal!");
 
       if (target == this.GreaterThird) {
         throw new Exception("I should not be a internal node with 3 nodes!");
@@ -272,6 +339,156 @@ public class TTFTree<E extends java.lang.Comparable<E>> {
       this.GreaterFirst = right;
       this.GreaterSecond = null;
       this.GreaterThird = null;
+    }
+  }
+
+  private void pruneChildren() {
+    if (this.LessFirst != null && this.LessFirst.isLeaf() && this.LessFirst.nodesOnThisLevel() == 0)
+      this.LessFirst = null;
+
+    if (this.GreaterFirst != null && this.GreaterFirst.isLeaf() && this.GreaterFirst.nodesOnThisLevel() == 0)
+      this.GreaterFirst = null;
+
+    if (this.GreaterSecond != null && this.GreaterSecond.isLeaf() && this.GreaterSecond.nodesOnThisLevel() == 0)
+      this.GreaterSecond = null;
+
+    if (this.GreaterThird != null && this.GreaterThird.isLeaf() && this.GreaterThird.nodesOnThisLevel() == 0)
+      this.GreaterThird = null;
+  }
+
+  private void checkForRuleViolations(TTFTree<E> child) {
+    if (child == null) {
+      return;
+    }
+
+    if (child.nodesOnThisLevel() == 1) {
+      System.out.format("%s violates rule 1. Has one child\r\n", child);
+      TTFTree<E> target = null;
+      if (child == this.LessFirst) {
+        target = this.GreaterFirst;
+      } else if (child == this.GreaterFirst) {
+        target = this.GreaterSecond;
+      } else if (child == this.GreaterSecond) {
+        target = this.GreaterThird;
+      }
+
+      if (target != null) {
+        if (target.nodesOnThisLevel() > 1 && !isRoot) {
+          handleRuleOne(child, target);
+        } else if (this.Second == null && target.nodesOnThisLevel() == 1 && isRoot) {
+          handleRuleTwo(child, target);
+        } else if (this.Second != null && target.nodesOnThisLevel() > 1 && !isRoot) {
+          handleRuleThree(child, target);
+        }
+      } else {
+        // we need to work backwards
+        if (child == this.GreaterFirst) {
+          target = this.LessFirst;
+        } else if (child == this.GreaterSecond) {
+          target = this.GreaterFirst;
+        } else if (child == this.GreaterThird) {
+          target = this.GreaterSecond;
+        }
+
+        if (target != null) {
+          if (target.nodesOnThisLevel() > 1 && !isRoot) {
+            handleRuleOne(target, child);
+          } else if (this.Second == null && target.nodesOnThisLevel() == 1 && isRoot) {
+            handleRuleTwo(target, child);
+          } else if (this.Second != null && target.nodesOnThisLevel() > 1 && !isRoot) {
+            handleRuleThree(target, child);
+          }
+        }
+      }
+    }
+  }
+
+  private void handleRuleOne(TTFTree<E> child, TTFTree<E> target) {
+    // swap out our relative object
+    E previousParent = null;
+    TTFTree leftTree;
+    if (child == this.LessFirst) {
+      previousParent = this.First;
+      this.First = target.First;
+    } else if (child == this.GreaterFirst) {
+      previousParent = this.Second;
+      this.First = target.First;
+    } else if (child == this.GreaterSecond) {
+      previousParent = this.Third;
+      this.First = target.First;
+    }
+
+    child.Second = previousParent;
+    child.GreaterFirst = target.LessFirst;
+
+    target.First = target.Second;
+    target.Second = target.Third;
+    target.LessFirst = target.GreaterFirst;
+    target.GreaterFirst = target.GreaterSecond;
+    target.GreaterSecond = target.GreaterThird;
+    target.GreaterThird = null;
+  }
+
+  private void handleRuleTwo(TTFTree<E> child, TTFTree<E> target) {
+    // we will merge up to our parent
+    this.Second = this.First;
+    this.First = child.First;
+    this.Third = target.First;
+
+    this.LessFirst = child.LessFirst;
+    this.GreaterFirst = child.GreaterFirst;
+
+    this.GreaterSecond = target.LessFirst;
+    this.GreaterThird = target.GreaterFirst;
+  }
+
+  private void handleRuleThree(TTFTree<E> child, TTFTree<E> target) {
+    
+  }
+
+  public void Print() {
+    Print(0);
+  }
+
+  public void Print(int padding) {
+    String paddingString = "";
+    for (int i = 0; i < padding; i++)
+      paddingString += " ";
+
+    String describeMe = isRoot ? "Root" : "Self";
+    System.out.format("%s%s:\r\n", paddingString, describeMe);
+    System.out.format("%s First: %s\r\n", paddingString, this.First == null ? "(null)" : this.First.toString());
+    System.out.format("%s Second: %s\r\n", paddingString, this.Second == null ? "(null)" : this.Second.toString());
+    System.out.format("%s Third: %s\r\n", paddingString, this.Third == null ? "(null)" : this.Third.toString());
+
+    System.out.println();
+    System.out.format("%sChildren:\r\n", paddingString);
+    System.out.format("%s Left First:\r\n", paddingString);
+    if (this.LessFirst != null) {
+      this.LessFirst.Print(padding + 3);
+    } else {
+      System.out.format("%s  (null)\r\n", paddingString);
+    }
+
+    System.out.format("%s Left Second:\r\n", paddingString);
+    if (this.GreaterFirst != null) {
+      this.GreaterFirst.Print(padding + 3);
+    } else {
+      System.out.format("%s  (null)\r\n", paddingString);
+    }
+
+    System.out.format("%s Left Third:\r\n", paddingString);
+    if (this.GreaterSecond != null) {
+      this.GreaterSecond.Print(padding + 3);
+    } else {
+      System.out.format("%s  (null)\r\n", paddingString);
+    }
+
+    System.out.format("%s Right Third:\r\n", paddingString);
+    if (this.GreaterThird != null) {
+      this.GreaterThird.Print(padding + 3);
+    } else {
+      System.out.format("%s  (null)\r\n", paddingString);
     }
   }
 

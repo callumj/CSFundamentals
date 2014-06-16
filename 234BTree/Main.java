@@ -13,6 +13,12 @@ public class Main {
     inst.Insert(58);
     inst.Insert(57);
 
+    //inst.Print();
+
+    inst.Remove(80);
+    inst.Remove(60);
+    //inst.Remove(25);*/
+
     inst.Print();
   }
 }
